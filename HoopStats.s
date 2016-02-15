@@ -39,6 +39,7 @@ next: .space 4
 	.globl main
 
 main:
+	# TODO: figure out when to do the stack pointer stuff
 	li $s7, 0 # head node empty? 0 = empty, 1 = not empty
 	
 	li $v0, 9 # malloc syscall for HEAD node
@@ -155,7 +156,7 @@ printHead:
 	syscall
 	
 	li $v0, 1 # print Integer
-	la $a0, 64($s0) # load head JPG
+	lw $a0, 64($s0) # load head JPG
 	syscall
 	
 	li $v0, 4 # print String
@@ -179,7 +180,7 @@ printHead:
 		syscall
 		
 		li $v0, 1 # print Integer
-		la $a0, 64($a0) # load node JPG
+		lw $a0, 64($a0) # load node JPG
 		syscall
 		
 		li $v0, 4 # print String
