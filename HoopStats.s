@@ -4,6 +4,7 @@ askName: .asciiz "What is the player name? \n"
 askJersey: .asciiz "What is the jersey number?"
 askPoints: .asciiz "How many points per game?"
 test: .asciiz "test"
+flag: .asciiz "flag"
 done: .asciiz "DONE\n"
 D: .asciiz "D"
 O: .asciiz "O"
@@ -39,18 +40,19 @@ next: .space 4
 .text
 	.globl main
 
-initStructs:
-	# li $v0, 9 # malloc syscall
-	# la $a0, full # allot full buffer
-	# syscall
+main:
+	li $v0, 9 # malloc syscall
+	la $a0, full # allot full buffer
+	syscall
 	# move $s0, $v0 # store address of head node
-	#
-	# li $v0, 9 # malloc syscall
-	# la $a0, full # allot full buffer
-	# syscall
-	# move $s1, $v0 # store address of current node
+	add $s0, $v0, $0
+
+	li $v0, 9 # malloc syscall
+	la $a0, full # allot full buffer
+	syscall
+	move $s1, $v0 # store address of current node
 	
-main:	
+askForString:	
 	li $v0, 4 # print string
 	la $a0, askName
 	syscall
@@ -59,6 +61,11 @@ main:
 	la $a0, full # prep node
 	syscall
 	move $s2, $v0 # store address of allocated space
+	
+	# li $a0, 72 # DONE - allot String buffer
+	# li $v0, 9 # TODO: read w/ malloc
+	# syscall
+	# add $s1, $v0, $zero #Save s1 as the head, set it as empty
 	
 	li $v0, 8 # read string
 	move $a0, $v0 # address for string to be stored
@@ -110,39 +117,47 @@ main:
 		
 		# TODO: store t0, t1, and t2 in a struct
 		# j print
-		j main 
+		j askForString
 	
 checkDone:  
-		move $t0, $a0 # store input string
-		lb $t1($t0) # first char of input
+		# move $t0, $a0 # store input string
+		lb $t1($a0) # first char of input
 		la $t2, D # load "D"
 		lb $t3($t2) # first char of DONE (D)
-
+		
+		li $v0, 4 # print string
+		la $a0, test
+		syscall
+		
 		bne $t1, $t2, continue # ask for jersey/points
 
-		addi $t0, $t0, 1 # shift over to next letter
-		lb $t1($t0) # first char of input
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
 		la $t2, O # load "O"
 		lb $t3($t2) # second char of DONE (O)
 		
 		bne $t1, $t2, continue # ask for jersey/points
 		
-		addi $t0, $t0, 1 # shift over to next letter
-		lb $t1($t0) # first char of input
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
 		la $t2, O # load "N"
 		lb $t3($t2) # third char of DONE (N)
 		
 		bne $t1, $t2, continue # ask for jersey/points
 		
-		addi $t0, $t0, 1 # shift over to next letter
-		lb $t1($t0) # first char of input
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
 		la $t2, O # load "E"
 		lb $t3($t2) # fourth char of DONE (E)
 		
 		bne $t1, $t2, continue # ask for jersey/points
 		
-		addi $t0, $t0, 1 # shift over to next letter
-		lb $t1($t0) # first char of input
+		li $v0, 4 # print string
+		la $a0, flag
+		syscall
+		
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
 		la $t2, nln # load "E"
 		lb $t3($t2) # fourth char of DONE (E)
 		
