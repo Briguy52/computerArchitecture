@@ -26,6 +26,12 @@ next: .space 4
 # read_file: .word 14
 # write_file: .word 15
 
+# li $v0, 8 # read String input
+# la $a0, name # allot buffer
+# li $a1, 64 # allot byte space
+# move $t0, $a0 # store
+# syscall
+
 .text
 	.globl main
 
@@ -33,33 +39,34 @@ initStructs:
 	# li $a0, full # allot full buffer
 	# li $v0, 9 # malloc syscall
 	# syscall
-	# move $s0, $v0 # set head node
+	# move $s0, $v0 # store address of head node
 	#
 	# li $a0, full # allot full buffer
 	# li $v0, 9 # malloc syscall
 	# syscall
-	# move $s1, $v0 # set current node
+	# move $s1, $v0 # store address of current node
 	
 main:	
 	la $a0, askName
 	la $v0, 4
 	syscall
 	
-	li $v0, 8 # read String input
-    la $a0, name # allot buffer
-    li $a1, 64 # allot byte space
-	move $t0, $a0 # store
-    syscall
-	
 	li $v0, 9 # malloc
 	li $a0, full # prep node
-	syscall 
-	move $s2, $v0 # TODO: what's this line for? 
+	syscall
+	move $s2, $v0 # store address of allocated space
 	
-	li $v0, 8 # read string 
-	move $a0, $v0 
-	li $a1, name
-	# li $a1, 64 # TODO: do we need to allot byte space?
+	li $v0, 8 # read string
+	move $a0, $v0 # allot buffer for String input
+	li $a1, name # allot byte space
+	syscall
+	
+	j checkDone
+	
+	li $v0, 8 # read string
+	move $a0, $v0
+	li $a0, name
+	move $t0, $a0
 	syscall
 	
 	li $v0, 4 # print input name
@@ -100,8 +107,18 @@ main:
 		j main 
 	
 checkDone:  
-	    move $t1, $a0
-	    la $t2, done
+	    move $t0, $a0 # store input string
+	    la $t1, done # load DONE
+		lb $t2($t0) # first char of input
+		lb $t3($t1) # first char of DONE (D) 
+		
+		la $t1, Dstr	#Load first character from "FINISHED"
+		lb $t2($t1) 
+		lb $t0($a0) #Load first character from input name
+	
+		beq $t3, $t2, continue 
+		j continue
+		
 	loopThruString:
 	    lb $t3($t1)         # load a byte from each string
 	    lb $t4($t2)
