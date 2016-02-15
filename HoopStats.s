@@ -29,8 +29,8 @@ next: .space 4
 # write_file: .word 15
 
 # li $v0, 8 # read String input
-# la $a0, name # allot buffer
-# li $a1, 64 # allot byte space
+# la $a0, name # where to store?
+# li $a1, 64 # how much space?
 # move $t0, $a0 # store
 # syscall
 
@@ -40,15 +40,12 @@ next: .space 4
 main:
 	li $s7, 0 # head node empty? 0 = empty, 1 = not empty
 	
-	li $v0, 9 # malloc syscall
-	# la $a0, full # allot full buffer
+	li $v0, 9 # malloc syscall for HEAD node
 	li $a0, 72
 	syscall
-	# move $s0, $v0 # store address of head node
-	add $s0, $v0, $0
+	move $s0, $v0
 
-	li $v0, 9 # malloc syscall
-	# la $a0, full # allot full buffer
+	li $v0, 9 # malloc syscall for NEXT node
 	li $a0, 72
 	syscall
 	move $s1, $v0 # store address of current node
@@ -58,17 +55,14 @@ askForString:
 	la $a0, askName
 	syscall
 	
-	li $v0, 9 # malloc
-	# la $a0, full # prep node
+	li $v0, 9 # malloc syscall for NEW node 
 	li $a0, 72
 	syscall
-	move $s2, $v0 # TODO: store address of allocated space 
+	move $s2, $v0 # TODO: $s2 is the NEW NODE for storing NAME, JPG, and POINTER
 	
 	li $v0, 8 # read string
-	move $a0, $s2 # address for string to be stored
-	# la $a0, name
-	la $a1, name # number of chars to read + 1
-	# li $a1, 64
+	move $a0, $s2 # STORE name in my NEW node
+	la $a1, 64 # number of chars to read + 1
 	syscall
 	
 	j checkDone
@@ -96,46 +90,11 @@ askForString:
 		li $v0, 1
 		syscall 
 		
-		sw $t3, name($s2) # move name bytes down and store your JPG
+		sw $t3, 64($s2) # move NAME bytes down and store your JPG
 
 		beqz $s7, newLL
 		
-		j askForString
-	
-checkDone:  
-	# TODO: great!
-		lb $t1($a0) # first char of input
-		la $t2, done # load "D"
-		lb $t3($t2) # first char of DONE (D)
-		
-		bne $t1, $t3, continue # ask for jersey/points
-
-		addi $a0, $a0, 1 # shift over to next letter
-		lb $t1($a0) # first char of input
-		addi $t2, $t2, 1
-		lb $t3($t2) # second char of DONE (O)
-		
-		bne $t1, $t3, continue # ask for jersey/points
-		
-		addi $a0, $a0, 1 # shift over to next letter
-		lb $t1($a0) # first char of input
-		addi $t2, $t2, 1
-		lb $t3($t2) # third char of DONE (N)
-		
-		bne $t1, $t3, continue # ask for jersey/points
-		
-		addi $a0, $a0, 1 # shift over to next letter
-		lb $t1($a0) # first char of input
-		addi $t2, $t2, 1
-		lb $t3($t2) # fourth char of DONE (E)
-		
-		bne $t1, $t3, continue # ask for jersey/points
-		
-		li $v0, 4 # print string
-		la $a0, flag
-		syscall
-
-		j print
+		j existingLL
 
 newLL: 
 	li $s7, 1 # set head to NON-EMPTY
@@ -144,10 +103,81 @@ newLL:
 	j askForString # begin next cycle
 	
 existingLL:
-	sw $s2, nameAndJPG($s1) # move along next node (past already stored name + JPG)
-	move $s1, $s2 # shift pointers along
+	sw $s2, 68($s1) # prepare to store POINTER
+	move $s1, $s2 # this -> this.next
 	j askForString # begin next cycle
 	
-print:
+checkDone:  
+	# TODO: great!
+		lb $t1($a0) # first char of input
+		la $t2, done # load "D"
+		lb $t3($t2) # first char of DONE (D)
+	
+		bne $t1, $t3, continue # ask for jersey/points
+
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
+		addi $t2, $t2, 1
+		lb $t3($t2) # second char of DONE (O)
+	
+		bne $t1, $t3, continue # ask for jersey/points
+	
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
+		addi $t2, $t2, 1
+		lb $t3($t2) # third char of DONE (N)
+	
+		bne $t1, $t3, continue # ask for jersey/points
+	
+		addi $a0, $a0, 1 # shift over to next letter
+		lb $t1($a0) # first char of input
+		addi $t2, $t2, 1
+		lb $t3($t2) # fourth char of DONE (E)
+	
+		bne $t1, $t3, continue # ask for jersey/points
+	
+		li $v0, 4 # print string
+		la $a0, flag
+		syscall
+
+		j printHead
+		
+printHead:
+	# TODO: streamline your code!
+	
+	li $v0, 4 # print String
+	la $a0, 0($s0) #load head NAME
+	syscall 
+	
+	li $v0, 1 # print Integer
+	la $a0, 64($s0) # load head JPG
+	syscall
+	
+	li $v0, 4 # print String
+	la $a0, nln # load new line
+	syscall
+	
+	lw $a1, 68($s0) # load pointer to NEXT
+	
+	j printRemaining
+
+	printRemaining:
+		beqz $a1, end # if null pointer (no next) then END
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+end:
 	li $v0, 10 # service for leaving
 	syscall
