@@ -3,8 +3,8 @@ nln: .asciiz "\n"
 askName: .asciiz "What is the player name? \n"
 askJersey: .asciiz "What is the jersey number?"
 askPoints: .asciiz "How many points per game?"
-test: .asciiz "test"
-flag: .asciiz "flag"
+test: .asciiz "test\n"
+flag: .asciiz "flag\n"
 done: .asciiz "DONE\n"
 D: .asciiz "D"
 O: .asciiz "O"
@@ -42,13 +42,15 @@ next: .space 4
 
 main:
 	li $v0, 9 # malloc syscall
-	la $a0, full # allot full buffer
+	# la $a0, full # allot full buffer
+	li $a0, 72
 	syscall
 	# move $s0, $v0 # store address of head node
 	add $s0, $v0, $0
 
 	li $v0, 9 # malloc syscall
-	la $a0, full # allot full buffer
+	# la $a0, full # allot full buffer
+	li $a0, 72
 	syscall
 	move $s1, $v0 # store address of current node
 	
@@ -58,7 +60,8 @@ askForString:
 	syscall
 	
 	li $v0, 9 # malloc
-	la $a0, full # prep node
+	# la $a0, full # prep node
+	li $a0, 72
 	syscall
 	move $s2, $v0 # store address of allocated space
 	
@@ -68,7 +71,7 @@ askForString:
 	# add $s1, $v0, $zero #Save s1 as the head, set it as empty
 	
 	li $v0, 8 # read string
-	move $a0, $v0 # address for string to be stored
+	move $a0, $s2 # address for string to be stored
 	# la $a0, name
 	la $a1, name # number of chars to read + 1
 	# li $a1, 64
