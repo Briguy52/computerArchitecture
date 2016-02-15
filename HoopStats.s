@@ -3,6 +3,7 @@ nln: .asciiz "\n"
 askName: .asciiz "What is the player name?"
 askJersey: .asciiz "What is the jersey number?"
 askPoints: .asciiz "How many points per game?"
+space: .asciiz " " 
 test: .asciiz "test\n"
 flag: .asciiz "Ending cycle\n"
 done: .asciiz "DONE"
@@ -98,8 +99,8 @@ askForString:
 
 newLL: 
 	li $s7, 1 # set head to NON-EMPTY
-	addi $s0, $s2, 0 # add new node ($s2) to head ($s0) 
-	addi $s1, $s0, 0 # add these next node in list ($s1) 
+	move $s0, $s2 # add new node ($s2) to head ($s0) 
+	move $s1, $s0 # add these next node in list ($s1)
 	j askForString # begin next cycle
 	
 existingLL:
@@ -149,6 +150,10 @@ printHead:
 	la $a0, 0($s0) #load head NAME
 	syscall 
 	
+	li $v0, 4 # print String
+	la $a0, space # load space
+	syscall
+	
 	li $v0, 1 # print Integer
 	la $a0, 64($s0) # load head JPG
 	syscall
@@ -162,21 +167,29 @@ printHead:
 	j printRemaining
 
 	printRemaining:
-		beqz $a1, end # if null pointer (no next) then END
+		# $a0 is the NODE, $a1 is the pointer to its NEXT
+		beqz $a1, end # TODO: if null pointer (no next) then END
 		
+		li $v0, 4 # print String
+		la $a0, 0($a0) # load node NAME
+		syscall
 		
+		li $v0, 4 # print String
+		la $a0, space # load space
+		syscall
 		
+		li $v0, 1 # print Integer
+		la $a0, 64($a0) # load node JPG
+		syscall
 		
+		li $v0, 4 # print String
+		la $a0, nln # load new line
+		syscall
 		
+		lw $t0, 68($a1) # TODO: load pointer to NEXT
+		move $a1, $t0 
 		
-		
-		
-		
-		
-		
-		
-		
-		
+		j printRemaining
 		
 end:
 	li $v0, 10 # service for leaving
