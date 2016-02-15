@@ -1,10 +1,14 @@
 .data
 nln: .asciiz "\n"
-askName: .asciiz "What is the player name?"
+askName: .asciiz "What is the player name? \n"
 askJersey: .asciiz "What is the jersey number?"
 askPoints: .asciiz "How many points per game?"
 test: .asciiz "test"
-done: .asciiz "DONE"
+done: .asciiz "DONE\n"
+D: .asciiz "D"
+O: .asciiz "O"
+N: .asciiz "N"
+E: .asciiz "E"
 full: .space 72
 name: .space 64
 jpg: .space 4
@@ -36,36 +40,38 @@ next: .space 4
 	.globl main
 
 initStructs:
-	# li $a0, full # allot full buffer
 	# li $v0, 9 # malloc syscall
+	# la $a0, full # allot full buffer
 	# syscall
 	# move $s0, $v0 # store address of head node
 	#
-	# li $a0, full # allot full buffer
 	# li $v0, 9 # malloc syscall
+	# la $a0, full # allot full buffer
 	# syscall
 	# move $s1, $v0 # store address of current node
 	
 main:	
+	li $v0, 4 # print string
 	la $a0, askName
-	la $v0, 4
 	syscall
 	
 	li $v0, 9 # malloc
-	li $a0, full # prep node
+	la $a0, full # prep node
 	syscall
 	move $s2, $v0 # store address of allocated space
 	
 	li $v0, 8 # read string
-	move $a0, $v0 # allot buffer for String input
-	li $a1, name # allot byte space
+	move $a0, $v0 # address for string to be stored
+	# la $a0, name
+	la $a1, name # number of chars to read + 1
+	# li $a1, 64
 	syscall
 	
 	j checkDone
 	
 	li $v0, 8 # read string
 	move $a0, $v0
-	li $a0, name
+	la $a0, name
 	move $t0, $a0
 	syscall
 	
@@ -107,41 +113,60 @@ main:
 		j main 
 	
 checkDone:  
-	    move $t0, $a0 # store input string
-	    la $t1, done # load DONE
-		lb $t2($t0) # first char of input
-		lb $t3($t1) # first char of DONE (D) 
-		
-		la $t1, Dstr	#Load first character from "FINISHED"
-		lb $t2($t1) 
-		lb $t0($a0) #Load first character from input name
-	
-		beq $t3, $t2, continue 
-		j continue
-		
-	loopThruString:
-	    lb $t3($t1)         # load a byte from each string
-	    lb $t4($t2)
-		beqz $t3, checkt2 #str1 end
-		beqz $t4, mismatch
-		slt $t5, $t3, $t4  #compare two bytes
-		bnez $t5, mismatch
-		addi $t1, $t1, 1  #t1 points to the next byte of str1
-		addi $t2, $t2, 1
-		j loopThruString
+		move $t0, $a0 # store input string
+		lb $t1($t0) # first char of input
+		la $t2, D # load "D"
+		lb $t3($t2) # first char of DONE (D)
 
-		mismatch: 
-		li $v0, 1
-		j endfunction
+		bne $t1, $t2, continue # ask for jersey/points
+
+		addi $t0, $t0, 1 # shift over to next letter
+		lb $t1($t0) # first char of input
+		la $t2, O # load "O"
+		lb $t3($t2) # second char of DONE (O)
 		
-		checkt2:
-		bnez $t4, mismatch 
-		li $v0, 0 
-
-		endfunction:
-		jr $ra
-
-	 
+		bne $t1, $t2, continue # ask for jersey/points
+		
+		addi $t0, $t0, 1 # shift over to next letter
+		lb $t1($t0) # first char of input
+		la $t2, O # load "N"
+		lb $t3($t2) # third char of DONE (N)
+		
+		bne $t1, $t2, continue # ask for jersey/points
+		
+		addi $t0, $t0, 1 # shift over to next letter
+		lb $t1($t0) # first char of input
+		la $t2, O # load "E"
+		lb $t3($t2) # fourth char of DONE (E)
+		
+		bne $t1, $t2, continue # ask for jersey/points
+		
+		addi $t0, $t0, 1 # shift over to next letter
+		lb $t1($t0) # first char of input
+		la $t2, nln # load "E"
+		lb $t3($t2) # fourth char of DONE (E)
+		
+		bne $t1, $t2, continue # ask for jersey/points
+		
+		j print
+		
+		
+		# move $t0, $a0
+		# la $t1, done
+		# li $t4, 0 # counter variable
+		# li $t5, 4
+		# j loop
+		#
+		# loop:
+		# 	beq $t4, $t5, continue
+		# 	lb $t2($t0)
+		# 	lb $t3($t1)
+		# 	bne $t3, $t2, continue # ask for jersey/points
+		# 	addi $t0, $t0, 1
+		# 	addi $t1, $t1, 1
+		# 	addi $t4, $t4, 1
+		# 	j loop
+				 
 print:
 	li $v0, 10 # service for leaving
 	syscall

@@ -11,19 +11,19 @@ Newstr: .asciiz "\n"
 .text
 	.globl main
 main:
-	li $t2, 5					
+	li $t2, 5
 	#la $t5, FINISHED
-	li $t4, 1 #Node add counter  
-	
+	li $t4, 1 #Node add counter
+
 	li $a0, 68 # DONE - allot String buffer
 	li $v0, 9 # TODO: read w/ malloc
-	syscall 
-	add $s1, $v0, $zero #Save s1 as the head, set it as empty  
-	
+	syscall
+	add $s1, $v0, $zero #Save s1 as the head, set it as empty
+
 	li $a0, 68
 	li $v0, 9
-	syscall 
-	add $s3, $v0, $zero #Save s3 as the current node, set it as empty  		
+	syscall
+	add $s3, $v0, $zero #Save s3 as the current node, set it as empty
 								
 getName:
 	#Initiating length of name to 0 
