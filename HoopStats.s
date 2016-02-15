@@ -51,15 +51,15 @@ main:
 	move $t0, $a0 # store
     syscall
 	
-	li $a0, full
-	li $v0, 9
+	li $v0, 9 # malloc
+	li $a0, full # prep node
 	syscall 
-	move $s2, $v0
+	move $s2, $v0 # TODO: what's this line for? 
 	
-	li $v0, 8 
-	move $a0, $v0
+	li $v0, 8 # read string 
+	move $a0, $v0 
 	li $a1, name
-	li $a1, 64 # allot byte space
+	# li $a1, 64 # TODO: do we need to allot byte space?
 	syscall
 	
 	li $v0, 4 # print input name
