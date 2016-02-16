@@ -39,7 +39,6 @@ next: .space 4
 	.globl main
 
 main:
-	# TODO: figure out when to do the stack pointer stuff
 	li $s7, 0 # head node empty? 0 = empty, 1 = not empty
 	
 	li $v0, 9 # malloc syscall for HEAD node
@@ -137,19 +136,27 @@ checkDone:
 		lb $t3($t2) # fourth char of DONE (E)
 	
 		bne $t1, $t3, continue # ask for jersey/points
-	
-		# li $v0, 4 # print string
-		# la $a0, flag
-		# syscall
 
 		j printHead
 		
 printHead:
 	# TODO: streamline your code!
+	move $t0, $s0
+	li $t2, 10
 	
-	li $v0, 4 # print String
+	loop:
+		lb $t1($t0)
+		beq $t1, $t2, fix
+		addi $t0, $t0, 1
+		j loop
+		
+		fix: 
+			li $t3, 0
+			sb $t3, 0($t0)
+		
+	li $v0, 4 #print String
 	la $a0, 0($s0) #load head NAME
-	syscall 
+	syscall
 	
 	li $v0, 4 # print String
 	la $a0, space # load space
@@ -159,59 +166,33 @@ printHead:
 	lw $a0, 64($s0) # load head JPG
 	syscall
 	
-	# li $v0, 4 # print String
-	# la $a0, nln # load new line
-	# syscall
+	li $v0, 4 # print String
+	la $a0, nln # load new line
+	syscall
 	
 	lw $a1, 68($s0) # load pointer to NEXT
-	#
-	# li $v0,10
-	# syscall
 	
 	j printRemaining
 	
-	
-
 	printRemaining:
 		# $a0 is the NODE, $a1 is the pointer to its NEXT
 		beqz $a1, end # TODO: if null pointer (no next) then END
 		
-		move $t0, $a1 
+		move $t0, $a1
 		li $t2, 10
-		
-		loop: 
+	
+		loop2:
 			lb $t1($t0)
-			beq $t2, $t1, skip
-			
-			remove:
+			beq $t1, $t2, fix2
+			addi $t0, $t0, 1
+			j loop2
+		
+			fix2: 
 				li $t3, 0
 				sb $t3, 0($t0)
-			
-		
-		# lw $t0, 0($a1) # load node NAME
-		# la $t2, nln
-		# lb $t3($t2)
-		
-		# lb $t1($t0)
-		
-		# li $v0, 4
-		# move $a0, $t0
-		# syscall
-
-		# checkNewLine:
-	# 		lb $t1($t0) # get a byte
-	# 		beq $t1, $t3, changeNewLine
-	# 		addi $t0, $t0, 1
-	# 		j checkNewLine
-	#
-	# 	changeNewLine:
-	# 		li $t6, 0
-	# 		sb $t6, 0($t0)
-	skip:
-		
+				
 		li $v0, 4 # print String
-		# la $a0, 0($a1) # load node NAME
-		move $a0, $t0
+		la $a0, 0($a1) # load node NAME
 		syscall
 		
 		li $v0, 4 # print String
