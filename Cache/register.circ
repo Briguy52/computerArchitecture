@@ -15,7 +15,7 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
       <a name="valign" val="base"/>
     </tool>
   </lib>
-  <main name="main"/>
+  <main name="singleRegister"/>
   <options>
     <a name="gateUndefined" val="ignore"/>
     <a name="simlimit" val="1000"/>
@@ -48,8 +48,8 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <tool lib="1" name="AND Gate"/>
     <tool lib="1" name="OR Gate"/>
   </toolbar>
-  <circuit name="main">
-    <a name="circuit" val="main"/>
+  <circuit name="singleRegister">
+    <a name="circuit" val="singleRegister"/>
     <a name="clabel" val=""/>
     <a name="clabelup" val="east"/>
     <a name="clabelfont" val="SansSerif plain 12"/>
@@ -397,5 +397,27 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
       <a name="label" val="14"/>
     </comp>
     <comp lib="4" loc="(400,360)" name="D Flip-Flop"/>
+  </circuit>
+  <circuit name="registerFile">
+    <a name="circuit" val="registerFile"/>
+    <a name="clabel" val=""/>
+    <a name="clabelup" val="east"/>
+    <a name="clabelfont" val="SansSerif plain 12"/>
+    <wire from="(210,200)" to="(220,200)"/>
+    <wire from="(210,140)" to="(210,200)"/>
+    <wire from="(210,60)" to="(210,130)"/>
+    <wire from="(210,130)" to="(210,140)"/>
+    <wire from="(80,140)" to="(210,140)"/>
+    <wire from="(210,270)" to="(220,270)"/>
+    <wire from="(210,130)" to="(220,130)"/>
+    <wire from="(210,60)" to="(220,60)"/>
+    <wire from="(210,200)" to="(210,270)"/>
+    <comp loc="(220,190)" name="singleRegister"/>
+    <comp lib="0" loc="(80,140)" name="Pin">
+      <a name="tristate" val="false"/>
+    </comp>
+    <comp loc="(220,120)" name="singleRegister"/>
+    <comp loc="(220,50)" name="singleRegister"/>
+    <comp loc="(220,260)" name="singleRegister"/>
   </circuit>
 </project>
